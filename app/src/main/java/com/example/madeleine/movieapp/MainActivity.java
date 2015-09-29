@@ -1,31 +1,32 @@
 package com.example.madeleine.movieapp;
 
-import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import java.util.ArrayList;
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EActivity;
 
-public class MainActivity extends FragmentActivity implements MovieListFragment.OnMovieSelectedListener {
+@EActivity(R.layout.activity_main)
+public class MainActivity extends FragmentActivity implements MovieListFragment_.OnMovieSelectedListener {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().add(R.id.fragment_content, new MovieListFragment()).commit();
 
     }
+
+    @AfterViews
+    protected void addFragment() {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().add(R.id.fragment_content, new MovieListFragment_()).commit();
+    }
+
 
 
     @Override
@@ -54,7 +55,7 @@ public class MainActivity extends FragmentActivity implements MovieListFragment.
     public void onMovieSelected(String movieId) {
         FragmentManager fm = getSupportFragmentManager();
 
-        MovieDetailFragment detailFragment = new MovieDetailFragment();
+        MovieDetailFragment detailFragment = new MovieDetailFragment_();
         Bundle args = new Bundle();
         args.putString("movieId", movieId);
         detailFragment.setArguments(args);

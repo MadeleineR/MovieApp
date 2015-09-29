@@ -16,21 +16,38 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
+
 import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
  */
+@EFragment(R.layout.fragment_detail)
 public class MovieDetailFragment extends Fragment implements DownloadJSONTask.AsyncListener {
 
     private String movieId;
+
+    @ViewById
+    TextView title;
+
+    @ViewById
+    TextView year;
+
+    @ViewById
+    TextView runtime;
+
+    @ViewById
+    WebView webView;
 
     public MovieDetailFragment() {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         String movieId = getArguments().getString("movieId");
         DownloadJSONTask downloadJSONTask = new DownloadJSONTask(this, 'i');
         String query = Uri.encode(movieId);
@@ -39,28 +56,24 @@ public class MovieDetailFragment extends Fragment implements DownloadJSONTask.As
     }
 
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+
+    @AfterViews
+    void updateTextWithDate() {
+        System.out.println("views bound!!!");
     }
 
 
     @Override
     public void setResults(ArrayList<Movie> results) {
-        TextView textView = (TextView) getView().findViewById(R.id.title);
-        textView.setText(results.get(0).getTitle());
-        TextView yearTxt = (TextView) getView().findViewById(R.id.year);
-        yearTxt.setText(results.get(0).getYear());
-        TextView runtimeTxt = (TextView) getView().findViewById(R.id.runtime);
-        runtimeTxt.setText(results.get(0).getRuntime());
+        title.setText(results.get(0).getTitle());
+        year.setText(results.get(0).getYear());
+        runtime.setText(results.get(0).getRuntime());
 
         if(results.get(0).getPoster() != null && results.get(0).getPoster() != "") {
-            WebView webView = (WebView) getView().findViewById(R.id.webView);
             Display display = getActivity().getWindowManager().getDefaultDisplay();
             int width = display.getWidth();
 
-            String data = "<html><head><title>Example</title><meta name=\"viewport\"\"content=\"width=" + width + ", initial-scale=0.65 \" /></head>";
+            String data = "<html><head><title>Poster</title><meta name=\"viewport\"\"content=\"width=" + width + ", initial-scale=0.65 \" /></head>";
             data = data + "<body><center><img width=\"100%\" src=\"" + results.get(0).getPoster() + "\" /></center></body></html>";
             webView.loadData(data, "text/html", null);
         }
