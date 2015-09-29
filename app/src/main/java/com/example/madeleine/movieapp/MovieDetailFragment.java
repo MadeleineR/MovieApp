@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -75,9 +77,13 @@ public class MovieDetailFragment extends Fragment implements DownloadJSONTask.As
 
             String data = "<html><head><title>Poster</title><meta name=\"viewport\"\"content=\"width=" + width + ", initial-scale=0.65 \" /></head>";
             data = data + "<body><center><img width=\"100%\" src=\"" + results.get(0).getPoster() + "\" /></center></body></html>";
+            try {
+                webView.loadData(URLEncoder.encode(data,"utf-8").replaceAll("\\+"," "), "text/html", "utf-8");
+
+            } catch (UnsupportedEncodingException e) {
+                webView.loadData("<html><head><title>Example</title><meta name=\"viewport\"\"content=\"width=" + width + ", initial-scale=0.65 \" /></head>", "text/html", "utf-8");
+            }
             webView.loadData(data, "text/html", null);
         }
-
-
     }
 }

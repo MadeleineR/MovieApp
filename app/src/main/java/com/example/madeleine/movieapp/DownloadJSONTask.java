@@ -7,17 +7,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * Created by Christoph on 21.09.2015.
@@ -49,7 +43,6 @@ public class DownloadJSONTask extends AsyncTask<String, Void, ArrayList<Movie>> 
     @Override
     protected void onPostExecute(ArrayList<Movie> result) {
         resultListener.setResults(result);
-        //textView.setText(result);
     }
 
     // Given a URL, establishes an HttpUrlConnection and retrieves
@@ -57,9 +50,6 @@ public class DownloadJSONTask extends AsyncTask<String, Void, ArrayList<Movie>> 
     // a string.
     private ArrayList<Movie> downloadUrl(String myurl) throws IOException {
         InputStream is = null;
-        // Only display the first 500 characters of the retrieved
-        // web page content.
-        int len = 500;
 
         try {
             URL url = new URL(myurl);
@@ -76,8 +66,7 @@ public class DownloadJSONTask extends AsyncTask<String, Void, ArrayList<Movie>> 
             is = conn.getInputStream();
 
             // Convert the InputStream into a string
-            String contentAsString = readIt(is, len);
-            //ArrayList results = parseMovieList(is, len);
+            String contentAsString = readIt(is);
             if (getParameter=='s') {
                 ArrayList results = parseMovieList(contentAsString);
                 return results;
@@ -102,54 +91,19 @@ public class DownloadJSONTask extends AsyncTask<String, Void, ArrayList<Movie>> 
 
 
     // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        /*Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);*/
-
+    public String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
         InputStreamReader is = new InputStreamReader(stream);
         StringBuilder sb=new StringBuilder();
         BufferedReader br = new BufferedReader(is);
         String read = br.readLine();
 
         while(read != null) {
-            //System.out.println(read);
             sb.append(read);
             read =br.readLine();
-
         }
 
         return sb.toString();
     }
-
-    // Reads an InputStream and converts it to a String.
-    /*public ArrayList<Map<String, String>> parseMovieList(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        JsonParser parser = new JsonParser();
-        try {
-            JsonObject jo = (JsonObject) parser.parse(reader);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            return null;
-        }
-        //JsonElement je = parser.parse(reader);
-        ArrayList<Map<String, String>> results = null;
-        if (je != null && je.isJsonArray()) {
-            JsonArray jarray = je.getAsJsonArray();
-            Gson gson = new Gson();
-            results = gson.fromJson(jarray, ArrayList.class);
-        }
-        else {
-            throw new IOException("JSON Element is not an array.");
-        }
-        return results;
-    }*/
 
     // Reads an InputStream and converts it to a String.
     public ArrayList<Movie> parseMovieList(String string) throws IOException, UnsupportedEncodingException {
