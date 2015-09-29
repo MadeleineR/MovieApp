@@ -9,23 +9,20 @@ import android.view.MenuItem;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.FragmentById;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends FragmentActivity implements MovieListFragment_.OnMovieSelectedListener {
+public class MainActivity extends FragmentActivity implements MovieListFragment.OnMovieSelectedListener {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-    }
-
-    @AfterViews
-    protected void addFragment() {
         FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().add(R.id.fragment_content, new MovieListFragment_()).commit();
+        MovieListFragment listFragment = new MovieListFragment();
+        fm.beginTransaction().add(R.id.fragment_content, listFragment).commit();
     }
+
 
 
 

@@ -37,8 +37,6 @@ public class MovieListFragment extends ListFragment implements DownloadJSONTask.
     OnMovieSelectedListener mCallback;
     private List<Movie> movies;
 
-    @ViewById
-    EditText inputSearch;
 
     @Override
     public void setResults(ArrayList<Movie> results) {
@@ -55,9 +53,15 @@ public class MovieListFragment extends ListFragment implements DownloadJSONTask.
     public MovieListFragment() {
     }
 
-    @AfterViews
-    public void setInputListener() {
-        //EditText inputSearch = (EditText) getView().findViewById(R.id.inputSearch);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EditText inputSearch = (EditText) getView().findViewById(R.id.inputSearch);
         inputSearch.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
