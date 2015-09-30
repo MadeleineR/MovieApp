@@ -17,10 +17,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.rest.Get;
+import org.androidannotations.annotations.rest.Rest;
+import org.androidannotations.annotations.rest.RestService;
 
 import java.util.ArrayList;
 
@@ -28,7 +34,7 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 @EFragment(R.layout.fragment_detail)
-public class MovieDetailFragment extends Fragment implements DownloadJSONTask.AsyncListener {
+public class MovieDetailFragment extends Fragment {
 
     private String movieId;
 
@@ -44,39 +50,39 @@ public class MovieDetailFragment extends Fragment implements DownloadJSONTask.As
     @ViewById
     WebView webView;
 
+    @RestService
+    MovieDBClient movieDBClient;
+
+
     public MovieDetailFragment() {
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         String movieId = getArguments().getString("movieId");
-        DownloadJSONTask downloadJSONTask = new DownloadJSONTask(this, 'i');
-        String query = Uri.encode(movieId);
-        String uri = "http://www.omdbapi.com/?i=" + query;
-        downloadJSONTask.execute(uri);
+        searchAsync(movieId);
     }
 
-
-
-    @AfterViews
-    void updateTextWithDate() {
-        System.out.println("views bound!!!");
+    @Background
+    void searchAsync(String id) {
+        Movie movie = movieDBClient.getMovie(id);
+        setResults(movie);
     }
 
+    @UiThread
+    public void setResults(Movie result) {
+        title.setText(result.getTitle());
+        year.setText(result.getYear());
+        runtime.setText(result.getRuntime());
 
-    @Override
-    public void setResults(ArrayList<Movie> results) {
-        title.setText(results.get(0).getTitle());
-        year.setText(results.get(0).getYear());
-        runtime.setText(results.get(0).getRuntime());
-
-        if(results.get(0).getPoster() != null && results.get(0).getPoster() != "") {
+        if(result.getPoster() != null && result.getPoster() != "") {
             Display display = getActivity().getWindowManager().getDefaultDisplay();
             int width = display.getWidth();
 
             String data = "<html><head><title>Poster</title><meta name=\"viewport\"\"content=\"width=" + width + ", initial-scale=0.65 \" /></head>";
-            data = data + "<body><center><img width=\"100%\" src=\"" + results.get(0).getPoster() + "\" /></center></body></html>";
+            data = data + "<body><center><img width=\"100%\" src=\"" + result.getPoster() + "\" /></center></body></html>";
             try {
                 webView.loadData(URLEncoder.encode(data,"utf-8").replaceAll("\\+"," "), "text/html", "utf-8");
 
