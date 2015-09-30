@@ -1,34 +1,21 @@
 package com.example.madeleine.movieapp;
 
 
-import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.rest.Get;
-import org.androidannotations.annotations.rest.Rest;
 import org.androidannotations.annotations.rest.RestService;
 
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +23,8 @@ import java.util.ArrayList;
 @EFragment(R.layout.fragment_detail)
 public class MovieDetailFragment extends Fragment {
 
-    private String movieId;
+    @FragmentArg
+    String movieId;
 
     @ViewById
     TextView title;
