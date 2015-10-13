@@ -8,7 +8,7 @@ import de.greenrobot.daogenerator.Schema;
 
 public class MovieAppDaoGenerator {
     public static void main(String args[]) throws Exception {
-        Schema schema = new Schema(4, "com.example.madeleine.movieapp");
+        Schema schema = new Schema(5, "com.example.madeleine.movieapp");
 
         Entity movieDetailDAO = schema.addEntity("MovieDetail");
         movieDetailDAO.addIdProperty();

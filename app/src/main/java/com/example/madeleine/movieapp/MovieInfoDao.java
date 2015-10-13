@@ -19,7 +19,7 @@ import com.example.madeleine.movieapp.MovieInfo;
 /** 
  * DAO for table "MOVIE_INFO".
 */
-public class MovieInfoDao extends AbstractDao<MovieInfo, Void> {
+public class MovieInfoDao extends AbstractDao<MovieInfo, Long> {
 
     public static final String TABLENAME = "MOVIE_INFO";
 
@@ -28,10 +28,11 @@ public class MovieInfoDao extends AbstractDao<MovieInfo, Void> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property ImdbID = new Property(0, String.class, "imdbID", false, "IMDB_ID");
-        public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
-        public final static Property DetailId = new Property(2, Long.class, "detailId", false, "DETAIL_ID");
-        public final static Property QueryId = new Property(3, Long.class, "queryId", false, "QUERY_ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property ImdbID = new Property(1, String.class, "imdbID", false, "IMDB_ID");
+        public final static Property Title = new Property(2, String.class, "title", false, "TITLE");
+        public final static Property DetailId = new Property(3, Long.class, "detailId", false, "DETAIL_ID");
+        public final static Property QueryId = new Property(4, Long.class, "queryId", false, "QUERY_ID");
     };
 
     private DaoSession daoSession;
@@ -51,10 +52,11 @@ public class MovieInfoDao extends AbstractDao<MovieInfo, Void> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MOVIE_INFO\" (" + //
-                "\"IMDB_ID\" TEXT," + // 0: imdbID
-                "\"TITLE\" TEXT," + // 1: title
-                "\"DETAIL_ID\" INTEGER," + // 2: detailId
-                "\"QUERY_ID\" INTEGER);"); // 3: queryId
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"IMDB_ID\" TEXT," + // 1: imdbID
+                "\"TITLE\" TEXT," + // 2: title
+                "\"DETAIL_ID\" INTEGER," + // 3: detailId
+                "\"QUERY_ID\" INTEGER);"); // 4: queryId
     }
 
     /** Drops the underlying database table. */
@@ -68,24 +70,29 @@ public class MovieInfoDao extends AbstractDao<MovieInfo, Void> {
     protected void bindValues(SQLiteStatement stmt, MovieInfo entity) {
         stmt.clearBindings();
  
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
         String imdbID = entity.getImdbID();
         if (imdbID != null) {
-            stmt.bindString(1, imdbID);
+            stmt.bindString(2, imdbID);
         }
  
         String title = entity.getTitle();
         if (title != null) {
-            stmt.bindString(2, title);
+            stmt.bindString(3, title);
         }
  
         Long detailId = entity.getDetailId();
         if (detailId != null) {
-            stmt.bindLong(3, detailId);
+            stmt.bindLong(4, detailId);
         }
  
         Long queryId = entity.getQueryId();
         if (queryId != null) {
-            stmt.bindLong(4, queryId);
+            stmt.bindLong(5, queryId);
         }
     }
 
@@ -97,18 +104,19 @@ public class MovieInfoDao extends AbstractDao<MovieInfo, Void> {
 
     /** @inheritdoc */
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public MovieInfo readEntity(Cursor cursor, int offset) {
         MovieInfo entity = new MovieInfo( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // imdbID
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
-            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // detailId
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // queryId
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // imdbID
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // title
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3), // detailId
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // queryId
         );
         return entity;
     }
@@ -116,23 +124,28 @@ public class MovieInfoDao extends AbstractDao<MovieInfo, Void> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, MovieInfo entity, int offset) {
-        entity.setImdbID(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setDetailId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
-        entity.setQueryId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setImdbID(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setTitle(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setDetailId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setQueryId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     /** @inheritdoc */
     @Override
-    protected Void updateKeyAfterInsert(MovieInfo entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected Long updateKeyAfterInsert(MovieInfo entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     /** @inheritdoc */
     @Override
-    public Void getKey(MovieInfo entity) {
-        return null;
+    public Long getKey(MovieInfo entity) {
+        if(entity != null) {
+            return entity.getId();
+        } else {
+            return null;
+        }
     }
 
     /** @inheritdoc */

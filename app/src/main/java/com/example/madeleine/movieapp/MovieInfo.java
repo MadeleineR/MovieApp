@@ -9,6 +9,7 @@ import de.greenrobot.dao.DaoException;
  */
 public class MovieInfo {
 
+    private Long id;
     private String imdbID;
     private String title;
     private Long detailId;
@@ -27,7 +28,12 @@ public class MovieInfo {
     public MovieInfo() {
     }
 
-    public MovieInfo(String imdbID, String title, Long detailId, Long queryId) {
+    public MovieInfo(Long id) {
+        this.id = id;
+    }
+
+    public MovieInfo(Long id, String imdbID, String title, Long detailId, Long queryId) {
+        this.id = id;
         this.imdbID = imdbID;
         this.title = title;
         this.detailId = detailId;
@@ -38,6 +44,14 @@ public class MovieInfo {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getMovieInfoDao() : null;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getImdbID() {
