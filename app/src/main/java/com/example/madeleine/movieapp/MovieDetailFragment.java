@@ -61,6 +61,7 @@ public class MovieDetailFragment extends Fragment {
 
     @UiThread
     public void setResults(Movie result) {
+
         title.setText(result.getTitle());
         year.setText(result.getYear());
         runtime.setText(result.getRuntime());

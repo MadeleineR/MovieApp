@@ -2,7 +2,6 @@ package com.example.madeleine.movieapp;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
@@ -16,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.EditorAction;
 import org.androidannotations.annotations.ItemClick;
@@ -61,17 +61,36 @@ public class MovieListFragment extends ListFragment {
         }
     }
 
+    @Click(R.id.gotoCacheBtn)
+    void onButtonClicked() {
+
+    }
+
 
     @Background
     void searchAsync(String searchString) {
         MovieList movieList = movieDBClient.getMovieList(searchString);
-        System.out.println(movieList.getResponse());
-        System.out.println(movieList.getError());
         if(movieList.getError() != null) {
             setResults(null);
         }
         else {
             setResults(movieList.getMovies());
+            MovieApplication application = (MovieApplication) getActivity().getApplication();
+            QueryDao queryDao = application.getDaoSession().getQueryDao();
+            Query query = new Query();
+            query.setSearchstring(searchString);
+            long queryId = queryDao.insert(query);
+
+            MovieInfoDao movieInfoDao = application.getDaoSession().getMovieInfoDao();
+
+            for (Movie movie : movieList.getMovies()) {
+                MovieInfo movieInfo = new MovieInfo();
+                movieInfo.setImdbID(movie.getId());
+                movieInfo.setTitle(movie.getTitle());
+                movieInfo.setQueryId(queryId);
+                movieInfoDao.insert(movieInfo);
+            }
+
         }
     }
 
