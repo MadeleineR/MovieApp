@@ -1,9 +1,11 @@
 package com.example.madeleine.movieapp;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 
 import org.androidannotations.annotations.EActivity;
 
@@ -30,6 +32,15 @@ public class MainActivity extends FragmentActivity implements MovieListFragment.
 
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.fragment_content, detailFragment);
+
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    public void replaceFragment(Fragment fragment){
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.fragment_content, fragment);
 
         ft.addToBackStack(null);
         ft.commit();

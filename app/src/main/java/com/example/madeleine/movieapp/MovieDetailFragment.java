@@ -50,13 +50,60 @@ public class MovieDetailFragment extends Fragment {
         super.onResume();
 
         String movieId = getArguments().getString("movieId");
-        searchAsync(movieId);
+
+        MovieApplication application = (MovieApplication) getActivity().getApplication();
+        MovieInfoDao movieInfoDao = application.getDaoSession().getMovieInfoDao();
+        MovieInfo movieInfo = movieInfoDao.queryBuilder().where(MovieInfoDao.Properties.ImdbID.eq(movieId)).unique();
+        MovieDetail movieDetail = movieInfo.getMovieDetail();
+        if(movieDetail != null) {
+            Movie movie = new Movie();
+            movie.setTitle(movieInfo.getTitle());
+            movie.setYear(movieDetail.getYear());
+            movie.setRuntime(movieDetail.getRuntime());
+            movie.setPoster(movieDetail.getPoster());
+            setResults(movie);
+        }
+        else {
+            searchAsync(movieId);
+        }
     }
 
     @Background
     void searchAsync(String id) {
         Movie movie = movieDBClient.getMovie(id);
         setResults(movie);
+        persistMovieDetails(movie);
+    }
+
+    void persistMovieDetails(Movie movie){
+        MovieApplication application = (MovieApplication) getActivity().getApplication();
+        MovieInfoDao movieInfoDao = application.getDaoSession().getMovieInfoDao();
+        MovieDetailDao movieDetailDao = application.getDaoSession().getMovieDetailDao();
+        MovieInfo movieInfo = movieInfoDao.queryBuilder().where(MovieInfoDao.Properties.ImdbID.eq(movie.getId())).unique();
+
+        MovieDetail detail = new MovieDetail();
+        detail.setActors(movie.getActors());
+        detail.setAwards(movie.getAwards());
+        detail.setCountry(movie.getCountry());
+        detail.setDirector(movie.getDirector());
+        detail.setGenre(movie.getGenre());
+        detail.setImdbRating(movie.getImdbRating());
+        detail.setImdbVotes(movie.getImdbVotes());
+        detail.setLanguage(movie.getLanguage());
+        detail.setMetascore(movie.getMetascore());
+        detail.setPlot(movie.getPlot());
+        detail.setPoster(movie.getPoster());
+        detail.setRated(movie.getRated());
+        detail.setReleased(movie.getReleased());
+        detail.setResponse(movie.getResponse());
+        detail.setRuntime(movie.getRuntime());
+        detail.setType(movie.getType());
+        detail.setWriter(movie.getWriter());
+        detail.setYear(movie.getYear());
+
+        long id = movieDetailDao.insert(detail);
+        movieInfo.setDetailId(id);
+        movieInfoDao.update(movieInfo);
     }
 
     @UiThread
@@ -78,7 +125,6 @@ public class MovieDetailFragment extends Fragment {
             } catch (UnsupportedEncodingException e) {
                 webView.loadData("<html><head><title>Example</title><meta name=\"viewport\"\"content=\"width=" + width + ", initial-scale=0.65 \" /></head>", "text/html", "utf-8");
             }
-            webView.loadData(data, "text/html", null);
         }
     }
 }

@@ -32,6 +32,7 @@ public class MovieAppDaoGenerator {
         movieDetailDAO.addStringProperty("country");
 
         Entity movie = schema.addEntity("MovieInfo");
+        movie.addIdProperty();
         movie.addStringProperty("imdbID");
         movie.addStringProperty("title");
         Property detailIdProperty = movie.addLongProperty("detailId").getProperty();

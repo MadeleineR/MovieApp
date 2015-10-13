@@ -18,6 +18,7 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.EditorAction;
+import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -26,12 +27,17 @@ import org.androidannotations.annotations.rest.RestService;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.dao.Property;
+
 
 @EFragment(R.layout.fragment_list)
 public class MovieListFragment extends ListFragment {
 
     OnMovieSelectedListener mCallback;
     private List<Movie> movies;
+
+    @FragmentArg
+    Long queryId;
 
     @ViewById
     EditText inputSearch;
@@ -40,6 +46,27 @@ public class MovieListFragment extends ListFragment {
     MovieDBClient movieDBClient;
 
     public MovieListFragment() {}
+
+    @Override
+    public void onCreate(Bundle savedInstances) {
+        super.onCreate(savedInstances);
+        long queryId  = getArguments().getLong("queryId");
+        if(queryId != 0L) {
+            MovieApplication application = (MovieApplication) getActivity().getApplication();
+            QueryDao queryDao = application.getDaoSession().getQueryDao();
+            Query query = queryDao.queryBuilder().where(QueryDao.Properties.Id.eq(queryId)).unique();
+            List<MovieInfo> movieInfos = query.getMovieInfoList();
+            movies = new ArrayList<>();
+            for (MovieInfo movieInfo : movieInfos) {
+                Movie movie = new Movie();
+                movie.setTitle(movieInfo.getTitle());
+                movie.setId(movieInfo.getImdbID());
+                movies.add(movie);
+            }
+            MovieListAdapter adapter = new MovieListAdapter(this.getContext(), movies.toArray(new Movie[movies.size()]));
+            setListAdapter(adapter);
+        }
+    }
 
 
     public interface OnMovieSelectedListener {
@@ -63,7 +90,7 @@ public class MovieListFragment extends ListFragment {
 
     @Click(R.id.gotoCacheBtn)
     void onButtonClicked() {
-
+        ((MainActivity) getActivity()).replaceFragment(new QueryCacheFragment());
     }
 
 
